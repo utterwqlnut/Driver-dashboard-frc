@@ -7,10 +7,17 @@ class cameras(threading.Thread):
 		self.camID = camID
 		self.name = name
 		self.counter = counter
+		self.cam = cv2.VideoCapture(camID)
 	def run(self):
-		threading.Lock().acquire()
-		show(self.camID)
-		threading.Lock().release()
+		while True:
+			self.ret,self.frame = self.cam.read()
+
+	def display(self):
+		cv2.imshow("camera "+str(self.camID),self.frame)
+		key = cv2.waitKey(0)
+		if key== ord('q'):
+			cv2.destroyAllWindows()
+			exit(1)
 def listCam():
 	index=0
 	valid_cams = []
@@ -26,19 +33,21 @@ def listCam():
 				valid_cams.append(index)
 		index+=1
 	return valid_cams
-def show(index):
-	cap = cv2.VideoCapture(index)
-	while True:
-		ret,frame = cap.read()
-		cv2.imshow("camera "+str(index),frame)
-		cv2.waitKey(10)
-	cv2.destroyWindow("camera "+str(index))
 def main():
 	allCams = listCam()
 	threads = []
 	for i,num in enumerate(allCams):
 		threads.append(cameras(num,"camera "+str(num),i))
 		threads[i].start()
+	while True:
+		for j,i in enumerate(threads):
+			try:
+				i.display()
+				if(j==1):
+					print("what?")
+			except AttributeError:
+				pass
+		
 	for i in threads:
 		i.join()
 if __name__=="__main__":
