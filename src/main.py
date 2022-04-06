@@ -43,8 +43,6 @@ def main():
 		for j,i in enumerate(threads):
 			try:
 				i.display()
-				if(j==1):
-					print("what?")
 			except AttributeError:
 				pass
 		
